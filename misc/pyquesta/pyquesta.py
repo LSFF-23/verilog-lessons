@@ -12,7 +12,8 @@ import glob
 import tempfile
 import subprocess
 import pathlib
-import time
+import datetime
+import traceback
 
 def find_top_level():
     """Encontra o primeiro *_tb.v ou *_tb.sv no diretório atual."""
@@ -177,4 +178,11 @@ wave zoom full
             pass
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except subprocess.CalledProcessError as e:
+        with open("pyquesta_log.txt", "a") as log_file:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_file.write(f"[{timestamp}] Error Occurred: {e}\n")
+            traceback.print_exc(file=log_file)
+            log_file.write("-" * 40 + "\n")
