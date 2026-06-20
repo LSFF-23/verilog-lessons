@@ -3,6 +3,9 @@
 pyquesta - Lança o Questa GUI com compilação automática,
 adiciona sinais à janela de onda e executa "run -all".
 Com -c, executa em modo console (sem GUI), exibindo apenas o transcript filtrado.
+
+Agora compila primeiro todos os arquivos que contenham "pkg" no nome (ordenados alfabeticamente),
+depois os demais.
 """
 
 import argparse
@@ -141,17 +144,34 @@ wave zoom full
         do_file = tmp.name
 
     try:
-        # Compilação
-        v_files = glob.glob('*.v')
-        sv_files = glob.glob('*.sv')
+        # ================================================================
+        # Compilação – pacotes primeiro, ordenados alfabeticamente
+        # ================================================================
+        all_v = glob.glob('*.v')
+        all_sv = glob.glob('*.sv')
 
-        if v_files:
-            print(f"Compilando {len(v_files)} arquivo(s) Verilog...")
-            subprocess.run(['vlog'] + v_files, check=True)
-        if sv_files:
-            print(f"Compilando {len(sv_files)} arquivo(s) SystemVerilog...")
-            subprocess.run(['vlog', '-sv'] + sv_files, check=True)
-        if not v_files and not sv_files:
+        def is_pkg(filename):
+            return 'pkg' in pathlib.Path(filename).stem.lower()
+
+        pkg_v = sorted([f for f in all_v if is_pkg(f)])
+        pkg_sv = sorted([f for f in all_sv if is_pkg(f)])
+        non_pkg_v = [f for f in all_v if not is_pkg(f)]
+        non_pkg_sv = [f for f in all_sv if not is_pkg(f)]
+
+        if pkg_v:
+            print(f"Compilando {len(pkg_v)} pacote(s) Verilog...")
+            subprocess.run(['vlog'] + pkg_v, check=True)
+        if pkg_sv:
+            print(f"Compilando {len(pkg_sv)} pacote(s) SystemVerilog...")
+            subprocess.run(['vlog', '-sv'] + pkg_sv, check=True)
+        if non_pkg_v:
+            print(f"Compilando {len(non_pkg_v)} arquivo(s) Verilog restantes...")
+            subprocess.run(['vlog'] + non_pkg_v, check=True)
+        if non_pkg_sv:
+            print(f"Compilando {len(non_pkg_sv)} arquivo(s) SystemVerilog restantes...")
+            subprocess.run(['vlog', '-sv'] + non_pkg_sv, check=True)
+
+        if not all_v and not all_sv:
             print("Aviso: nenhum arquivo .v/.sv encontrado no diretório.",
                   file=sys.stderr)
 
