@@ -1,11 +1,11 @@
 # ivlog files
 *.out
-.dvt
+*.dvt
 *.log
 
 # questa files
-*.mpf
 work/
+*.mpf
 *.wlf
 *.cr.mti
 
@@ -15,6 +15,5 @@ work/
 
 # others
 *.vcd
-transcript
 *.vstf
 *.txt
