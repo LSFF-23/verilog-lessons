@@ -157,6 +157,15 @@ wave zoom full
         all_v = glob.glob('*.v')
         all_sv = glob.glob('*.sv')
 
+        # Adiciona o arquivo especificado por -i (mesmo que esteja em subpasta)
+        if top_file.endswith('.v'):
+            all_v.append(top_file)
+        elif top_file.endswith('.sv'):
+            all_sv.append(top_file)
+        else:
+            print(f"Extensão não suportada para {top_file}", file=sys.stderr)
+            sys.exit(1)
+
         def is_pkg(filename):
             return 'pkg' in pathlib.Path(filename).stem.lower()
 
@@ -187,8 +196,7 @@ wave zoom full
             tail_vsim_output(proc)
             proc.wait()
         else:
-            vsim_cmd = ['vsim', '-voptargs=+acc', '-gui', '-wlf', wlf_name,
-                        '-do', do_file, top_module]
+            vsim_cmd = ['vsim', '-gui', '-wlf', wlf_name, '-do', do_file, top_module]
             print(f"Iniciando simulação com Questa para '{top_module}'...")
             proc = subprocess.Popen(vsim_cmd)
             proc.wait()
