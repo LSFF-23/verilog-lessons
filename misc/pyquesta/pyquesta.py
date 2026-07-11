@@ -196,7 +196,7 @@ wave zoom full
             tail_vsim_output(proc)
             proc.wait()
         else:
-            vsim_cmd = ['vsim', '-gui', '-wlf', wlf_name, '-do', do_file, top_module]
+            vsim_cmd = ['vsim', '-voptargs=+acc', '-gui', '-wlf', wlf_name, '-do', do_file, top_module]
             print(f"Iniciando simulação com Questa para '{top_module}'...")
             proc = subprocess.Popen(vsim_cmd)
             proc.wait()
